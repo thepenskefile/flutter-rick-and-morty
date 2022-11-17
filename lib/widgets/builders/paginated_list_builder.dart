@@ -5,16 +5,10 @@ class RequestResponse<T> {
   bool isPending = false;
   bool isResolved = false;
   bool isRejected = false;
-  List<T>? response = [];
+  List<T> response = [];
   Object? error;
 
-  RequestResponse({
-    required this.isPending,
-    required this.isResolved,
-    required this.isRejected,
-    this.response,
-    this.error,
-  });
+  RequestResponse();
 
   Map toJson() {
     return {
@@ -27,8 +21,12 @@ class RequestResponse<T> {
   }
 }
 
-typedef PaginatedListWidgetBuilder = Widget Function(BuildContext context,
-    RequestResponse requestResponse, ScrollController scrollController);
+typedef PaginatedListWidgetBuilder = Widget Function(
+  BuildContext context,
+  RequestResponse requestResponse,
+  ScrollController scrollController,
+  bool isLastPage,
+);
 
 class PaginatedListBuilder<T> extends StatefulWidget {
   final PaginatedListWidgetBuilder builder;
@@ -43,8 +41,8 @@ class PaginatedListBuilder<T> extends StatefulWidget {
 }
 
 class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder> {
-  late RequestResponse<T> requestResponse;
-  late ScrollController scrollController;
+  final RequestResponse<T> requestResponse = RequestResponse();
+  final ScrollController scrollController = ScrollController();
   late bool isLastPage;
   int currentPage = 1;
   late List<T> data;
@@ -52,12 +50,13 @@ class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder> {
   Future<void> getData() async {
     try {
       final RickAndMortyPaginatedResponse<T> response = await widget.future(
-          currentPage: currentPage) as RickAndMortyPaginatedResponse<T>;
+        currentPage: currentPage,
+      ) as RickAndMortyPaginatedResponse<T>;
+
       setState(() {
         requestResponse.isPending = false;
         requestResponse.isResolved = true;
-        data.addAll(response.results);
-        requestResponse.response = data;
+        requestResponse.response.addAll(response.results);
         isLastPage = response.info.next == null;
         currentPage = currentPage + 1;
       });
@@ -74,9 +73,6 @@ class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder> {
     super.initState();
     isLastPage = false;
     data = [];
-    scrollController = ScrollController();
-    requestResponse =
-        RequestResponse(isPending: true, isResolved: false, isRejected: false);
     getData();
   }
 
@@ -92,7 +88,12 @@ class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder> {
     });
 
     return Container(
-      child: widget.builder(context, requestResponse, scrollController),
+      child: widget.builder(
+        context,
+        requestResponse,
+        scrollController,
+        isLastPage,
+      ),
     );
   }
 }

@@ -24,9 +24,11 @@ class _CharacterScreenState extends State<CharacterScreen> {
     return data;
   }
 
-  Widget _buildCharacterList(
-      {required RequestResponse requestResponse,
-      required ScrollController scrollController}) {
+  Widget _buildCharacterList({
+    required RequestResponse requestResponse,
+    required ScrollController scrollController,
+    required bool isLastPage,
+  }) {
     final characters = requestResponse.response ?? [];
     if (characters.isEmpty) {
       if (requestResponse.isPending) {
@@ -48,7 +50,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
 
     return ListView.builder(
       controller: scrollController,
-      itemCount: characters.length + 1,
+      itemCount: characters.length + (isLastPage ? 0 : 1),
       itemBuilder: ((context, index) {
         if (index == characters.length) {
           if (requestResponse.isRejected) {
@@ -85,10 +87,12 @@ class _CharacterScreenState extends State<CharacterScreen> {
       ),
       body: PaginatedListBuilder<Character>(
         future: getCharacters,
-        builder: (context, requestResponse, scrollConroller) {
+        builder: (context, requestResponse, scrollConroller, isLastPage) {
           return _buildCharacterList(
-              requestResponse: requestResponse,
-              scrollController: scrollConroller);
+            requestResponse: requestResponse,  
+            scrollController: scrollConroller,
+            isLastPage: isLastPage,
+          );
         },
       ),
     );
