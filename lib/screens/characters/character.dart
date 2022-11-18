@@ -6,27 +6,29 @@ import 'package:rick_and_morty/services/rick_and_morty_api.dart';
 import 'package:rick_and_morty/models/character.dart';
 import 'package:rick_and_morty/widgets/characters/character_list_item.dart';
 
-import '../../hooks/use_request.dart';
-
 class CharacterScreen extends HookWidget {
   const CharacterScreen({
     super.key,
   });
 
-  Future<RickAndMortyPaginatedResponse<Character>> getCharacters(
-      {int currentPage = 1}) async {
+  Future<RickAndMortyPaginatedResponse<Character>> getCharacters({
+    int currentPage = 1,
+  }) async {
     final data = await RickAndMortyApi().getCharacters(
-      params: {'page': currentPage.toString()},
+      params: {
+        'page': currentPage.toString(),
+      },
     );
 
     return data;
   }
 
   Widget _buildCharacterList({
-    required RequestResponse requestResponse,
-    required ScrollController scrollController,
-    required bool isLastPage,
+    required PaginatedListResponse paginatedListResponse,
   }) {
+    final scrollController = paginatedListResponse.scrollController;
+    final requestResponse = paginatedListResponse.requestResponse;
+    final isLastPage = paginatedListResponse.isLastPage;
     final characters = requestResponse.response?.results ?? [];
     if (characters == null || characters.isEmpty) {
       if (requestResponse.isPending) {
@@ -79,7 +81,7 @@ class CharacterScreen extends HookWidget {
         final Character character = characters[index];
         return Padding(
           padding: const EdgeInsets.all(15.0),
-          child: CharacterListItem(character),
+          child: CharacterListItem(character: character),
         );
       }),
     );
@@ -95,9 +97,7 @@ class CharacterScreen extends HookWidget {
         title: const Text("Characters"),
       ),
       body: _buildCharacterList(
-        requestResponse: paginatedListResponse.requestResponse,
-        scrollController: paginatedListResponse.scrollController,
-        isLastPage: paginatedListResponse.isLastPage,
+        paginatedListResponse: paginatedListResponse,
       ),
     );
   }

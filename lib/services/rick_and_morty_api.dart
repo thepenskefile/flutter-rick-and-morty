@@ -8,8 +8,9 @@ class RickAndMortyApi {
 
   final client = http.Client();
 
-  Future<RickAndMortyPaginatedResponse<Character>> getCharacters(
-      {params}) async {
+  Future<RickAndMortyPaginatedResponse<Character>> getCharacters({
+    params,
+  }) async {
     final uri = Uri.https('www.rickandmortyapi.com', '/api/character', params);
     final response = await client.get(uri);
     Map<String, dynamic> data = json.decode(response.body);

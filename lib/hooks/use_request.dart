@@ -1,4 +1,5 @@
 import 'package:flutter_hooks/flutter_hooks.dart';
+
 import 'package:rick_and_morty/services/rick_and_morty_api.dart';
 
 class RequestResponse<T> {

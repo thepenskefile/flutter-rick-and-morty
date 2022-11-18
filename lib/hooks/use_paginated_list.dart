@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+
 import 'package:rick_and_morty/hooks/use_request.dart';
 import 'package:rick_and_morty/services/rick_and_morty_api.dart';
 
-class UsePaginatedListResponse {
+class PaginatedListResponse {
   RequestResponse requestResponse;
   ScrollController scrollController;
   bool isLastPage;
 
-  UsePaginatedListResponse({
+  PaginatedListResponse({
     required this.requestResponse,
     required this.scrollController,
     required this.isLastPage,
@@ -23,7 +24,7 @@ class UsePaginatedListResponse {
   }
 }
 
-UsePaginatedListResponse usePaginatedList<T>({
+PaginatedListResponse usePaginatedList<T>({
   required Future<RickAndMortyPaginatedResponse<T>> Function({int currentPage})
       future,
 }) {
@@ -50,7 +51,7 @@ UsePaginatedListResponse usePaginatedList<T>({
     }
   });
 
-  return UsePaginatedListResponse(
+  return PaginatedListResponse(
     requestResponse: requestResponse,
     scrollController: scrollController,
     isLastPage: isLastPage.value,

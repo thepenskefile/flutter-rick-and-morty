@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:rick_and_morty/services/rick_and_morty_api.dart';
 
 class BuilderRequestResponse<T> {
@@ -86,9 +87,6 @@ class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    // final test = useRequest(context: context, future: testGetData);
-    // print("BLAH TEST: $test");
-
     scrollController.addListener(() {
       var nextPageTrigger = 0.8 * scrollController.position.maxScrollExtent;
       if (scrollController.position.pixels > nextPageTrigger &&
