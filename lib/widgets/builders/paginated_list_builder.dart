@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:rick_and_morty/services/rick_and_morty_api.dart';
 
-class RequestResponse<T> {
+class BuilderRequestResponse<T> {
   bool isPending = false;
   bool isResolved = false;
   bool isRejected = false;
   List<T> response = [];
   Object? error;
 
-  RequestResponse();
+  BuilderRequestResponse();
 
   Map toJson() {
     return {
@@ -23,7 +23,7 @@ class RequestResponse<T> {
 
 typedef PaginatedListWidgetBuilder = Widget Function(
   BuildContext context,
-  RequestResponse requestResponse,
+  BuilderRequestResponse requestResponse,
   ScrollController scrollController,
   bool isLastPage,
 );
@@ -41,7 +41,7 @@ class PaginatedListBuilder<T> extends StatefulWidget {
 }
 
 class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder> {
-  final RequestResponse<T> requestResponse = RequestResponse();
+  final BuilderRequestResponse<T> requestResponse = BuilderRequestResponse();
   final ScrollController scrollController = ScrollController();
   late bool isLastPage;
   int currentPage = 1;
@@ -68,6 +68,14 @@ class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder> {
     }
   }
 
+  Future<RickAndMortyPaginatedResponse<T>> testGetData() async {
+    final RickAndMortyPaginatedResponse<T> response = await widget.future(
+      currentPage: currentPage,
+    ) as RickAndMortyPaginatedResponse<T>;
+
+    return response;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +86,9 @@ class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder> {
 
   @override
   Widget build(BuildContext context) {
+    // final test = useRequest(context: context, future: testGetData);
+    // print("BLAH TEST: $test");
+
     scrollController.addListener(() {
       var nextPageTrigger = 0.8 * scrollController.position.maxScrollExtent;
       if (scrollController.position.pixels > nextPageTrigger &&
