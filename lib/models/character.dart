@@ -1,6 +1,4 @@
-import 'package:rick_and_morty/models/rick_and_morty_data.dart';
-
-class Character implements RickAndMortyData {
+class Character {
   int id;
   String name;
   String status;
@@ -44,7 +42,6 @@ class Character implements RickAndMortyData {
         url = json['url'],
         created = json['created'];
 
-@override
   Map toJson() {
     return {
       'id': id,

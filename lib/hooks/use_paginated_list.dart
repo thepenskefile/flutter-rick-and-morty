@@ -8,10 +8,11 @@ class UsePaginatedListResponse {
   ScrollController scrollController;
   bool isLastPage;
 
-  UsePaginatedListResponse(
-      {required this.requestResponse,
-      required this.scrollController,
-      required this.isLastPage});
+  UsePaginatedListResponse({
+    required this.requestResponse,
+    required this.scrollController,
+    required this.isLastPage,
+  });
 
   Map toJson() {
     return {
@@ -27,36 +28,31 @@ UsePaginatedListResponse usePaginatedList<T>({
       future,
 }) {
   final ScrollController scrollController = ScrollController();
-  int currentPage = 1;
-  bool isLastPage = false;
+  var currentPage = useState<int>(1);
+  var isLastPage = useState<bool>(false);
 
   Future<RickAndMortyPaginatedResponse<T>> getPaginatedData() async {
-    final data = await future(currentPage: currentPage);
-    currentPage = currentPage + 1;
-    isLastPage = data.info.next == null;
+    final data = await future(currentPage: currentPage.value);
+    currentPage.value = currentPage.value + 1;
+    isLastPage.value = data.info.next == null;
 
     return data;
   }
 
   RequestResponse<RickAndMortyPaginatedResponse<T>> requestResponse =
-      useRequest(future: getPaginatedData, isPaginatedResponse: true);
-
-  final blahJson = requestResponse.toJson();
-  print("BLAH 2: $blahJson");
+      useRequest(future: getPaginatedData, isInfiniteResponse: true);
 
   scrollController.addListener(() {
     var nextPageTrigger = 0.8 * scrollController.position.maxScrollExtent;
     if (scrollController.position.pixels > nextPageTrigger &&
         !requestResponse.isPending) {
-      if (requestResponse.load != null) {
-        requestResponse.load!();
-      }
+      requestResponse.load();
     }
   });
 
   return UsePaginatedListResponse(
     requestResponse: requestResponse,
     scrollController: scrollController,
-    isLastPage: isLastPage,
+    isLastPage: isLastPage.value,
   );
 }

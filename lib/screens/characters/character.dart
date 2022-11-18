@@ -5,7 +5,6 @@ import 'package:rick_and_morty/hooks/use_paginated_list.dart';
 import 'package:rick_and_morty/services/rick_and_morty_api.dart';
 import 'package:rick_and_morty/models/character.dart';
 import 'package:rick_and_morty/widgets/characters/character_list_item.dart';
-import 'package:rick_and_morty/widgets/builders/paginated_list_builder.dart';
 
 import '../../hooks/use_request.dart';
 
@@ -90,25 +89,16 @@ class CharacterScreen extends HookWidget {
   Widget build(BuildContext context) {
     final paginatedListResponse =
         usePaginatedList<Character>(future: getCharacters);
+
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Characters"),
-        ),
-        body: _buildCharacterList(
-          requestResponse: paginatedListResponse.requestResponse,
-          scrollController: paginatedListResponse.scrollController,
-          isLastPage: paginatedListResponse.isLastPage,
-        )
-        // body: PaginatedListBuilder<Character>(
-        //   future: getCharacters,
-        //   builder: (context, requestResponse, scrollConroller, isLastPage) {
-        //     return _buildCharacterList(
-        //       requestResponse: requestResponse,
-        //       scrollController: scrollConroller,
-        //       isLastPage: isLastPage,
-        //     );
-        //   },
-        // ),
-        );
+      appBar: AppBar(
+        title: const Text("Characters"),
+      ),
+      body: _buildCharacterList(
+        requestResponse: paginatedListResponse.requestResponse,
+        scrollController: paginatedListResponse.scrollController,
+        isLastPage: paginatedListResponse.isLastPage,
+      ),
+    );
   }
 }
