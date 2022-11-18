@@ -35,11 +35,11 @@ RequestResponse<T> useRequest<T>({
   bool isInfiniteResponse = false,
 }) {
 
-  var isPending = useState<bool>(false);
-  var isResolved = useState<bool>(false);
-  var isRejected = useState<bool>(false);
-  var response = useState<T?>(null);
-  var error = useState<Object?>(null);
+  final isPending = useState<bool>(false);
+  final isResolved = useState<bool>(false);
+  final isRejected = useState<bool>(false);
+  final response = useState<T?>(null);
+  final error = useState<Object?>(null);
 
   Future<void> getData() async {
     isPending.value = true;

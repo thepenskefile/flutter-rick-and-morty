@@ -29,8 +29,8 @@ PaginatedListResponse usePaginatedList<T>({
       future,
 }) {
   final ScrollController scrollController = ScrollController();
-  var currentPage = useState<int>(1);
-  var isLastPage = useState<bool>(false);
+  final currentPage = useState<int>(1);
+  final isLastPage = useState<bool>(false);
 
   Future<RickAndMortyPaginatedResponse<T>> getPaginatedData() async {
     final data = await future(currentPage: currentPage.value);
