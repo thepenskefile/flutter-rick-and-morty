@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:rick_and_morty/screens/characters/character.dart';
+import 'package:rick_and_morty/screens/characters/characters.dart';
+import 'package:rick_and_morty/screens/locations/locations.dart';
+import 'package:rick_and_morty/widgets/ui/shadow_container.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,6 +32,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
+final List<Map<String, dynamic>> buttons = [
+  {
+    "displayName": "Characters",
+    "screen": const CharacterScreen(),
+  },
+  {
+    "displayName": "Locations",
+    "screen": const LocationsScreen(),
+  }
+];
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -39,22 +52,31 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Rick & Morty Character App"),
         ),
-        body: Column(
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
+        body: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: ListView.separated(
+            separatorBuilder: (context, index) {
+              return (const Padding(padding: EdgeInsets.all(10)));
+            },
+            itemCount: buttons.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                child: ShadowContainer(
+                  child: Text(
+                    buttons[index]["displayName"],
+                  ),
+                ),
+                onTap: () {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const CharacterScreen()));
-              },
-              child: const Text("Characters"),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text("Locations"),
-            )
-          ],
+                      builder: (context) => buttons[index]["screen"],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ));
   }
 }

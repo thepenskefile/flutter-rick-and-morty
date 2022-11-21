@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:rick_and_morty/models/character.dart';
+import 'package:rick_and_morty/models/location.dart';
 
 class RickAndMortyApi {
   static const rootUrl = 'https://rickandmortyapi.com/api';
@@ -26,6 +27,28 @@ class RickAndMortyApi {
 
     final paginatedResponse =
         RickAndMortyPaginatedResponse<Character>(characters, info);
+
+    return paginatedResponse;
+  }
+
+  Future<RickAndMortyPaginatedResponse<Location>> getLocations({
+    params,
+  }) async {
+    final uri = Uri.https('www.rickandmortyapi.com', '/api/location', params);
+    final response = await client.get(uri);
+    Map<String, dynamic> data = json.decode(response.body);
+
+    List<dynamic> dynamicList = data["results"];
+    var locations = <Location>[];
+    for (var location in dynamicList) {
+      locations.add(Location.fromJson(location));
+    }
+
+    Map<String, dynamic> dynamicInfo = data["info"];
+    final info = RickAndMortyInfo.fromJson(dynamicInfo);
+
+    final paginatedResponse =
+        RickAndMortyPaginatedResponse<Location>(locations, info);
 
     return paginatedResponse;
   }

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
-import 'package:rick_and_morty/models/character.dart';
+import 'package:rick_and_morty/models/location.dart';
 import 'package:rick_and_morty/widgets/ui/shadow_container.dart';
 
-class CharacterListItem extends StatelessWidget {
-  final Character character;
+class LocationListItem extends StatelessWidget {
+  final Location location;
 
-  const CharacterListItem({super.key, required this.character});
+  const LocationListItem({super.key, required this.location});
 
   @override
   Widget build(BuildContext context) {
     return ShadowContainer(
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Text(character.getName),
+        child: Text(location.getName),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
+import 'package:rick_and_morty/models/request_response.dart';
 import 'package:rick_and_morty/hooks/use_request.dart';
 import 'package:rick_and_morty/services/rick_and_morty_api.dart';
 
@@ -41,7 +42,10 @@ PaginatedListResponse usePaginatedList<T>({
   }
 
   RequestResponse<RickAndMortyPaginatedResponse<T>> requestResponse =
-      useRequest(future: getPaginatedData, isInfiniteResponse: true);
+      useRequest(
+    future: getPaginatedData,
+    isInfiniteResponse: true,
+  );
 
   scrollController.addListener(() {
     var nextPageTrigger = 0.8 * scrollController.position.maxScrollExtent;

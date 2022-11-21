@@ -1,108 +1,77 @@
 import 'package:flutter/material.dart';
+import 'package:rick_and_morty/models/request_response.dart';
 
 import 'package:rick_and_morty/services/rick_and_morty_api.dart';
+import 'package:rick_and_morty/widgets/builders/request_builder.dart';
 
-class BuilderRequestResponse<T> {
-  bool isPending = false;
-  bool isResolved = false;
-  bool isRejected = false;
-  List<T> response = [];
-  Object? error;
-
-  BuilderRequestResponse();
-
-  Map toJson() {
-    return {
-      'isPending': isPending,
-      'isResolved': isResolved,
-      'isRejected': isRejected,
-      'response': response,
-      'error': error,
-    };
-  }
-}
-
-typedef PaginatedListWidgetBuilder = Widget Function(
+typedef PaginatedListWidgetBuilder<T> = Widget Function(
   BuildContext context,
-  BuilderRequestResponse requestResponse,
+  RequestResponse<RickAndMortyPaginatedResponse<T>> requestResponse,
   ScrollController scrollController,
   bool isLastPage,
 );
 
 class PaginatedListBuilder<T> extends StatefulWidget {
-  final PaginatedListWidgetBuilder builder;
+  final PaginatedListWidgetBuilder<T> builder;
   final Future<RickAndMortyPaginatedResponse<T>> Function({int currentPage})
       future;
 
-  const PaginatedListBuilder(
-      {super.key, required this.builder, required this.future});
+  const PaginatedListBuilder({
+    super.key,
+    required this.builder,
+    required this.future,
+  });
 
   @override
-  State<PaginatedListBuilder> createState() => _PaginatedListBuilderState<T>();
+  State<PaginatedListBuilder<T>> createState() =>
+      _PaginatedListBuilderState<T>();
 }
 
-class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder> {
-  final BuilderRequestResponse<T> requestResponse = BuilderRequestResponse();
+class _PaginatedListBuilderState<T> extends State<PaginatedListBuilder<T>> {
   final ScrollController scrollController = ScrollController();
-  late bool isLastPage;
+  bool isLastPage = false;
   int currentPage = 1;
-  late List<T> data;
+  List<T>? data;
 
-  Future<void> getData() async {
-    try {
-      final RickAndMortyPaginatedResponse<T> response = await widget.future(
-        currentPage: currentPage,
-      ) as RickAndMortyPaginatedResponse<T>;
-
-      setState(() {
-        requestResponse.isPending = false;
-        requestResponse.isResolved = true;
-        requestResponse.response.addAll(response.results);
-        isLastPage = response.info.next == null;
-        currentPage = currentPage + 1;
-      });
-    } catch (error) {
-      setState(() {
-        requestResponse.isRejected = true;
-        requestResponse.error = error;
-      });
-    }
-  }
-
-  Future<RickAndMortyPaginatedResponse<T>> testGetData() async {
-    final RickAndMortyPaginatedResponse<T> response = await widget.future(
+  Future<RickAndMortyPaginatedResponse<T>> getPaginatedData() async {
+    final RickAndMortyPaginatedResponse<T> data = await widget.future(
       currentPage: currentPage,
-    ) as RickAndMortyPaginatedResponse<T>;
+    );
+    currentPage = currentPage + 1;
+    isLastPage = data.info.next == null;
 
-    return response;
+    return data;
   }
 
   @override
   void initState() {
     super.initState();
-    isLastPage = false;
-    data = [];
-    getData();
   }
 
   @override
   Widget build(BuildContext context) {
-    scrollController.addListener(() {
-      var nextPageTrigger = 0.8 * scrollController.position.maxScrollExtent;
-      if (scrollController.position.pixels > nextPageTrigger &&
-          !requestResponse.isPending) {
-        requestResponse.isPending = true;
-        getData();
-      }
-    });
+    return RequestBuilder<RickAndMortyPaginatedResponse<T>>(
+      future: getPaginatedData,
+      isInfiniteResponse: true,
+      builder: (context, requestResponse) {
+        scrollController.addListener(() {
+          var nextPageTrigger = 0.8 * scrollController.position.maxScrollExtent;
+          if (scrollController.position.pixels > nextPageTrigger &&
+              !requestResponse.isPending) {
+            requestResponse.isPending = true;
+            requestResponse.load();
+          }
+        });
 
-    return Container(
-      child: widget.builder(
-        context,
-        requestResponse,
-        scrollController,
-        isLastPage,
-      ),
+        return Container(
+          child: widget.builder(
+            context,
+            requestResponse,
+            scrollController,
+            isLastPage,
+          ),
+        );
+      },
     );
   }
 }
